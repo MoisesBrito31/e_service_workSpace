@@ -1,0 +1,39 @@
+stateDiagram-v2
+    [*] --> AguardandoAgendamento : Vendedor cadastra requisição (Cliente, Responsável, Local)
+
+    state AguardandoAgendamento {
+        [*] --> RascunhoDemanda
+    }
+
+    AguardandoAgendamento --> EmDesenvolvimento : Gestor programa na agenda e Técnico inicia (Respeitando Trava Sequencial)
+
+    state EmDesenvolvimento {
+        [*] --> ExecutandoTecnico
+        ExecutandoTecnico --> GerandoArtefatos : Elabora Relatório, Proposta BOM (Conjuntos/Sub-itens) e Topologia
+    }
+
+    EmDesenvolvimento --> AguardandoInformacao : Técnico retorna card pedindo dados ao Vendedor/Comercial\n(⏱️ Pausa o relógio de eficiência técnica)
+    AguardandoInformacao --> EmDesenvolvimento : Informações fornecidas\n(⏱️ Retoma o relógio de eficiência técnica)
+
+    EmDesenvolvimento --> DefinicaoComercial : Técnico conclui os 3 entregáveis e avança
+
+    state DefinicaoComercial {
+        [*] --> AnaliseComercial
+    }
+
+    DefinicaoComercial --> EmDesenvolvimento : Comercial solicita modificações / dúvidas\n(Gera nova versão de artefatos)
+    DefinicaoComercial --> InstalacaoServico : Comercial aprova proposta
+
+    state InstalacaoServico {
+        [*] --> PlanejandoInstalacao
+        PlanejandoInstalacao --> ExecutandoServicosCampo : Abre Ordem de Serviço (OS) e gera Relatórios Futuros
+    }
+
+    InstalacaoServico --> Concluido : Projeto e serviços finalizados
+    Concluido --> [*]
+
+    %% Estado global de cancelamento em qualquer etapa pré-conclusão
+    AguardandoAgendamento --> Cancelado : Gestor cancela
+    EmDesenvolvimento --> Cancelado : Gestor cancela
+    DefinicaoComercial --> Cancelado : Gestor cancela
+    Cancelado --> [*]

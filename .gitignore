@@ -1,0 +1,72 @@
+# ─── Python / Django ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+backend/staticfiles/
+backend/media/
+backend/staticfiles/
+
+# Migrations (mantenha as migrations no git para rastrear o schema)
+# Se quiser ignorar: backend/**/migrations/0*.py
+
+# ─── Variáveis de Ambiente / Segredos ─────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example  # mantém o .env.example como referência pública
+
+# ─── Node.js / Vue 3 / Vite ───────────────────────────────────────────────────
+frontend/node_modules/
+frontend/dist/          # Build gerado — não versionar, gera-se com npm run deploy
+frontend/.env.local
+frontend/.env.*.local
+
+# Logs do npm/node
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Cache do Vite
+frontend/.vite/
+
+# ─── IDEs e Editores ──────────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swp
+.DS_Store
+Thumbs.db
+
+# ─── Docker ───────────────────────────────────────────────────────────────────
+# Volumes Docker são locais, não versionar
+docker-data/
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.orig

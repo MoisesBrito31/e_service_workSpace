@@ -1,0 +1,19 @@
+Atue como Arquiteto de Software Sênior e Desenvolvedore Full-Stack. Preciso que você inicie a construção de um Sistema de Gestão de Projetos Industriais utilizando a seguinte stack e arquitetura estritas:
+
+1. STACK TECNOLÓGICA:
+- Backend: Python 3.10+, Django, Django REST Framework (DRF), SimpleJWT para autenticação.
+- Banco de Dados (Estratégia Híbrida): MySQL para Produção/Desenvolvimento local e SQLite em memória exclusivamente para rodar os testes automatizados.
+- Gestão de Arquivos (Object Storage): django-storages + boto3 apontando para MinIO (desenvolvimento/local) e AWS S3 (produção). Nada de salvar arquivos binários locais no Django.
+- Geradores de Documentos (Backend): 'html2docx' para gerar arquivos Word (.docx) e 'WeasyPrint' para gerar PDFs a partir do HTML estruturado.
+- Frontend: Vue 3 (Composition API / <script setup>), Pinia, Tailwind CSS e API Fetch nativa para todas as requisições HTTP (proibido o uso de Axios).
+- Editor de Texto Rico (Frontend): TipTap Editor integrado no Vue 3 para permitir edição visual avançada de relatórios diretamente no navegador, com suporte a colagem de imagens (Ctrl+V / drag-and-drop).
+
+2. MÓDULOS E FUNCIONALIDADES PRINCIPAIS DO SISTEMA:
+- Identificação Única: Todo projeto possui um código alfanumérico único (ex: PR-132-01) e dados do cliente (Nome, Responsável ex: Sandro, Local ex: Piraquê Madureira).
+- Governança de Agenda e Fila: O gestor agenda e define a ordem de execução e horas de SLA para cada técnico. O técnico possui trava sequencial na fila (não pode iniciar o projeto B se houver projeto anterior pendente na sua agenda, a menos que o gestor altere a ordem).
+- Pausa de SLA: Quando o técnico devolve o card por falta de dados (status AGUARDANDO_INFORMACAO), o relógio de eficiência técnica é pausado via controle no histórico.
+- BOM Hierárquica (Catálogo e Propostas): Catálogo centralizado dividido em 8 famílias base (Banner, Turck, Red Lion, Smac MCA, Wago, Elétrica, Mecânica, Serviço). As propostas possuem Conjuntos e PropostaItems com suporte a sub-itens internos (explosão de árvore).
+- Sistema de Comentários estilo Microsoft Planner: Cada card de projeto possui uma aba de comentários e histórico de atividades com suporte a menções a usuários (@usuario).
+- Versionamento de Artefatos: Relatórios e propostas geram novas versões (v1, v2...) em caso de revisões comerciais, salvando os arquivos oficiais gerados diretamente no Object Storage.
+
+Por favor, comece estruturando a árvore de diretórios do projeto e criando os modelos iniciais (Models) do Django no backend para validarmos o banco de dados relacional.

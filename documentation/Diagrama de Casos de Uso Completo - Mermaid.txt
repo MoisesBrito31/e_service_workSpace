@@ -1,0 +1,67 @@
+graph LR
+    %% Atores
+    Vendedor([Vendedor])
+    Gestor([Gestor])
+    Tecnico([Técnico de Desenvolvimento])
+    Comercial([Equipe Comercial])
+
+    subgraph Sistema_Gestao_Projetos [Sistema de Gestão de Projetos Industriais]
+        %% Bloco Vendas
+        UC01[UC01: Cadastrar Requisição de Projeto]
+        UC02[UC02: Responder Dúvidas / Complementar Dados]
+
+        %% Bloco Gestão e Agenda
+        UC03[UC03: Gerenciar Agenda e Ordem de Execução]
+        UC04[UC04: Definir Tempo Estimado SLA]
+        UC05[UC05: Monitorar Métricas de Eficiência e Status]
+        UC06[UC06: Gerenciar Catálogo Central de Itens]
+
+        %% Bloco Execução Técnica
+        UC07[UC07: Visualizar Próximo Projeto Liberado na Agenda]
+        UC08[UC08: Iniciar Execução Técnica]
+        UC09[UC09: Retornar Projeto por Falta de Dados]
+        UC10[UC10: Elaborar Relatório Descritivo Word/PDF]
+        UC11[UC11: Montar Proposta Comercial Tabela de Itens]
+        UC12[UC12: Estruturar / Anexar Topologia]
+        UC13[UC13: Concluir Entrega Técnica]
+
+        %% Bloco Comercial e Pós-Venda
+        UC14[UC14: Realizar Definição Comercial]
+        UC15[UC15: Solicitar Modificações / Tirar Dúvidas]
+        UC16[UC16: Abrir Processo de Instalação / Serviço]
+        UC17[UC17: Registrar Relatórios de Serviços Futuros]
+    end
+
+    %% Conexões Vendedor
+    Vendedor --> UC01
+    Vendedor --> UC02
+
+    %% Conexões Gestor
+    Gestor --> UC03
+    Gestor --> UC04
+    Gestor --> UC05
+    Gestor --> UC06
+
+    %% Conexões Técnico
+    Tecnico --> UC07
+    Tecnico --> UC08
+    Tecnico --> UC09
+    Tecnico --> UC13
+
+    %% Inclusões e Extensões Técnicas
+    UC08 -.->|<<include>>| UC10
+    UC08 -.->|<<include>>| UC11
+    UC08 -.->|<<include>>| UC12
+    UC09 -.->|<<extend>>| UC08
+
+    %% Conexões Comercial
+    Comercial --> UC14
+    Comercial --> UC15
+    Comercial --> UC16
+    Comercial --> UC17
+
+    %% Relacionamentos de Negócio entre Casos de Uso
+    UC03 -.->|<<include>>| UC04
+    UC15 -.->|<<extend>>| UC14
+    UC16 -.->|<<extend>>| UC14
+    UC17 -.->|<<include>>| UC16

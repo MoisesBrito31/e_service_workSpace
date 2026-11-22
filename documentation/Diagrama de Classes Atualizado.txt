@@ -1,0 +1,108 @@
+classDiagram
+    class Cliente {
+        +UUID id
+        +String nome_cliente
+        +String responsavel_contato
+        +String local_aproximado
+    }
+
+    class Projeto {
+        +UUID id
+        +String codigo_projeto_alfanumerico
+        +String titulo
+        +Text descricao_demanda
+        +Enum status [AGUARDANDO_AGENDAMENTO, EM_DESENVOLVIMENTO, AGUARDANDO_INFO, DEFINICAO_COMERCIAL, INSTALACAO, CONCLUIDO, CANCELADO]
+        +DateTime data_criacao
+        +DateTime data_conclusao
+    }
+
+    class FamiliaItem {
+        +UUID id
+        +String nome [BANNER, TURCK, REDLION, SMAC_MCA, WAGO, ELETRICA, MECANICA, SERVICO]
+    }
+
+    class CatalogoItem {
+        +UUID id
+        +String sku_codigo
+        +String nome
+        +Text especificacao_tecnica
+        +Decimal preco_base
+        +Boolean ativo
+    }
+
+    class Proposta {
+        +UUID id
+        +Integer versao
+        +Decimal valor_total
+        +DateTime data_geracao
+        +Enum status_proposta [RASCUNHO, ENVIADA_COMERCIAL, APROVADA, REVISAO]
+    }
+
+    class ConjuntoProposta {
+        +UUID id
+        +String nome_conjunto
+        +Text descricao
+    }
+
+    class PropostaItem {
+        +UUID id
+        +Integer quantidade
+        +Decimal preco_unitario_aplicado
+        +Text observacao_tecnica
+        +Boolean eh_subitem
+    }
+
+    class AgendaTecnica {
+        +UUID id
+        +Integer ordem_execucao
+        +DateTime data_programada
+        +Float horas_estimadas_sla
+        +Float horas_efetivas_gastas
+        +Enum status_agenda [PENDENTE, EM_ANDAMENTO, PAUSADO, CONCLUIDO]
+    }
+
+    class HistoricoStatus {
+        +UUID id
+        +Enum status_anterior
+        +Enum status_novo
+        +DateTime data_mudanca
+        +Text motivo_retorno
+        +Boolean pausa_contagem_tempo
+    }
+
+    class RelatorioDescritivo {
+        +UUID id
+        +Integer versao
+        +String titulo
+        +Text conteudo_markdown_ou_texto
+        +String caminho_arquivo_docx
+        +String caminho_arquivo_pdf
+    }
+
+    class Topologia {
+        +UUID id
+        +String nome_arquivo
+        +String url_armazenamento
+        +Text descricao_explicativa
+    }
+
+    %% Relacionamentos
+    Cliente "1" --> "*" Projeto : solicita
+    Projeto "1" *-- "1" AgendaTecnica : possui SLA/Alocação
+    Projeto "1" *-- "*" HistoricoStatus : registra pausas
+    
+    %% Relação da Estrutura de Proposta e Itens (BOM Hierárquica)
+    Projeto "1" *-- "*" Proposta : possui versões
+    Proposta "1" *-- "*" ConjuntoProposta : agrupa (Ex: Painel Elétrico 01)
+    ConjuntoProposta "1" *-- "*" PropostaItem : contém itens e sub-itens
+    
+    %% Hierarquia de sub-itens (Auto-relacionamento na árvore de itens)
+    PropostaItem "0..1" --> "*" PropostaItem : possui sub-itens (explosão)
+    
+    %% Vínculo com o Catálogo e Famílias
+    FamiliaItem "1" --> "*" CatalogoItem : categoriza
+    CatalogoItem "1" --> "*" PropostaItem : origina dados
+    
+    %% Outros artefatos
+    Projeto "1" *-- "*" RelatorioDescritivo : possui
+    Projeto "1" *-- "*" Topologia : organiza

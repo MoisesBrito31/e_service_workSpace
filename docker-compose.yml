@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: eservice_mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: eservice_db
+      MYSQL_USER: eservice_user
+      MYSQL_PASSWORD: eservice_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+
+  minio:
+    image: minio/minio:latest
+    container_name: eservice_minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+  minio_create_buckets:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      sleep 2;
+      /usr/bin/mc alias set local http://minio:9000 minioadmin minioadminpassword;
+      /usr/bin/mc mb local/eservice-artefatos --ignore-existing;
+      /usr/bin/mc anonymous set download local/eservice-artefatos;
+      exit 0;
+      "
+
+volumes:
+  mysql_data:
+  minio_data:

@@ -12,6 +12,17 @@ from .serializers import (
     MudarStatusSerializer,
 )
 
+
+class IsVendedorOrAdmin(permissions.BasePermission):
+    """Permite criação de projeto apenas para Vendedor e Admin."""
+    message = 'Apenas Vendedores e Administradores podem cadastrar novos projetos.'
+
+    def has_permission(self, request, view):
+        if not request.user.is_authenticated:
+            return False
+        return request.user.cargo in ('VENDEDOR', 'ADMIN') or request.user.is_superuser
+
+
 class ProjetoViewSet(viewsets.ModelViewSet):
     """
     ViewSet central para gerenciamento do ciclo de vida dos Projetos Industriais.
@@ -21,6 +32,12 @@ class ProjetoViewSet(viewsets.ModelViewSet):
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['codigo_projeto_alfanumerico', 'titulo', 'cliente__nome_cliente', 'cliente__responsavel_contato']
     ordering_fields = ['created_at', 'codigo_projeto_alfanumerico', 'status']
+
+    def get_permissions(self):
+        """Criação restrita a Vendedor e Admin. Demais ações exigem autenticação padrão."""
+        if self.action == 'create':
+            return [IsVendedorOrAdmin()]
+        return [permissions.IsAuthenticated()]
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -42,6 +59,28 @@ class ProjetoViewSet(viewsets.ModelViewSet):
         if tecnico_id:
             queryset = queryset.filter(agenda_tecnica__tecnico_id=tecnico_id)
         return queryset
+
+    @action(detail=False, methods=['get'], url_path='proximo-codigo')
+    def proximo_codigo(self, request):
+        """
+        Gera o próximo código alfanumérico disponível no padrão PR-XXX-01.
+        Exemplo de retorno: { "codigo": "PR-133-01" }
+        """
+        import re
+        ultimo = (
+            Projeto.objects
+            .filter(codigo_projeto_alfanumerico__regex=r'^PR-\d+-01$')
+            .order_by('-codigo_projeto_alfanumerico')
+            .values_list('codigo_projeto_alfanumerico', flat=True)
+            .first()
+        )
+        if ultimo:
+            match = re.search(r'PR-(\d+)-01', ultimo)
+            proximo_num = int(match.group(1)) + 1 if match else 1
+        else:
+            proximo_num = 1
+        codigo = f'PR-{proximo_num:03d}-01'
+        return Response({'codigo': codigo})
 
     @action(detail=True, methods=['post'])
     def mudar_status(self, request, pk=None):
@@ -115,3 +154,25 @@ class ProjetoViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         comentario = serializer.save()
         return Response(ComentarioProjetoSerializer(comentario).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=False, methods=['get'], url_path='proximo-codigo')
+    def proximo_codigo(self, request):
+        """
+        Gera o próximo código alfanumérico disponível no padrão PR-XXX-01.
+        Exemplo de retorno: { "codigo": "PR-133-01" }
+        """
+        import re
+        ultimo = (
+            Projeto.objects
+            .filter(codigo_projeto_alfanumerico__regex=r'^PR-\d+-01$')
+            .order_by('-codigo_projeto_alfanumerico')
+            .values_list('codigo_projeto_alfanumerico', flat=True)
+            .first()
+        )
+        if ultimo:
+            match = re.search(r'PR-(\d+)-01', ultimo)
+            proximo_num = int(match.group(1)) + 1 if match else 1
+        else:
+            proximo_num = 1
+        codigo = f'PR-{proximo_num:03d}-01'
+        return Response({'codigo': codigo})
